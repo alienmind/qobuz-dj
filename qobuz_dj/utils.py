@@ -7,7 +7,7 @@ import time
 from mutagen.flac import FLAC
 from mutagen.mp3 import EasyMP3
 
-from qobuz_dl.color import GREEN, RED, RESET, YELLOW
+from qobuz_dj.color import GREEN, RED, RESET, YELLOW
 
 logger = logging.getLogger(__name__)
 

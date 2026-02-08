@@ -5,12 +5,12 @@ import logging
 import os
 import sys
 
-from qobuz_dl.bundle import Bundle
-from qobuz_dl.color import GREEN, RED, YELLOW
-from qobuz_dl.commands import qobuz_dl_args
-from qobuz_dl.core import QobuzDL
-from qobuz_dl.downloader import DEFAULT_FOLDER, DEFAULT_TRACK
-from qobuz_dl.utils import (
+from qobuz_dj.bundle import Bundle
+from qobuz_dj.color import GREEN, RED, YELLOW
+from qobuz_dj.commands import qobuz_dj_args
+from qobuz_dj.core import QobuzDL
+from qobuz_dj.downloader import DEFAULT_FOLDER, DEFAULT_TRACK
+from qobuz_dj.utils import (
     sanitize_directory,
 )
 

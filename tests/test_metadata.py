@@ -1,6 +1,6 @@
 from unittest.mock import patch
 
-from qobuz_dl.metadata import _format_copyright, _format_genres, get_safe
+from qobuz_dj.metadata import _format_copyright, _format_genres, get_safe
 
 
 def test_format_genres_deduplication():

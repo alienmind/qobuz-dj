@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.scripts]
-qobuz-dj = "qobuz_dl.cli:main"
+qobuz-dj = "qobuz_dj.cli:main"
 qobuz-dj-gui = "qobuz_dj.gui:main"
 
 [build-system]
@@ -25,10 +25,10 @@ build-backend = "hatchling.build"
 package = true
 
 [tool.hatch.build.targets.wheel]
-packages = ["qobuz_dl"]
+packages = ["qobuz_dj"]
 
 [tool.pyright]
-include = ["qobuz_dl", "tests"]
+include = ["qobuz_dj", "tests"]
 exclude = ["**/__pycache__"]
 venvPath = "."
 venv = ".venv"

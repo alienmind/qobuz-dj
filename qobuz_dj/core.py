@@ -7,12 +7,12 @@ import requests
 from bs4 import BeautifulSoup as bso
 from pathvalidate import sanitize_filename
 
-from qobuz_dl import downloader, qopy
-from qobuz_dl.bundle import Bundle
-from qobuz_dl.color import CYAN, DF, GREEN, OFF, RED, RESET, YELLOW
-from qobuz_dl.db import create_db, handle_download_id
-from qobuz_dl.exceptions import NonStreamable
-from qobuz_dl.utils import (
+from qobuz_dj import downloader, qopy
+from qobuz_dj.bundle import Bundle
+from qobuz_dj.color import CYAN, DF, GREEN, OFF, RED, RESET, YELLOW
+from qobuz_dj.db import create_db, handle_download_id
+from qobuz_dj.exceptions import NonStreamable
+from qobuz_dj.utils import (
     PartialFormatter,
     create_and_return_dir,
     format_duration,
@@ -89,7 +89,7 @@ class QobuzDL:
         ]
 
         count = 0
-        from qobuz_dl.utils import get_url_info
+        from qobuz_dj.utils import get_url_info
 
         for d in dirs:
             # Heuristic to clean folder name for search

@@ -2,7 +2,7 @@ from unittest.mock import patch
 
 import pytest
 
-from qobuz_dl.utils import get_url_info, make_m3u
+from qobuz_dj.utils import get_url_info, make_m3u
 
 
 def test_make_m3u_utf8_encoding(tmp_path):

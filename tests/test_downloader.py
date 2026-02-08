@@ -1,4 +1,4 @@
-from qobuz_dl.downloader import _safe_get
+from qobuz_dj.downloader import _safe_get
 
 
 def test_safe_get_nested():
