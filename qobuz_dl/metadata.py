@@ -1,16 +1,16 @@
-import re
-import os
 import logging
+import os
+import re
 
-from mutagen.flac import FLAC, Picture
 import mutagen.id3 as id3  # type: ignore
+from mutagen.flac import FLAC, Picture
 from mutagen.id3 import ID3NoHeaderError  # type: ignore
 
 logger = logging.getLogger(__name__)
 
 
 # unicode symbols
-COPYRIGHT, PHON_COPYRIGHT = "\u2117", "\u00a9"
+COPYRIGHT, PHON_COPYRIGHT = "\u00a9", "\u2117"
 # if a metadata block exceeds this, mutagen will raise error
 # and the file won't be tagged
 FLAC_MAX_BLOCKSIZE = 16777215
