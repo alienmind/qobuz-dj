@@ -214,11 +214,13 @@ def tag_mp3(filename, root_dir, final_name, d, album, istrack=True, em_image=Fal
 
     tags["year"] = tags["date"][:4]
 
-    audio["TRCK"] = id3.TRCK(encoding=3, text=f'{d["track_number"]}/{tracktotal}')
+    audio["TRCK"] = id3.TRCK(encoding=3, text=f"{d['track_number']}/{tracktotal}")
     audio["TPOS"] = id3.TPOS(encoding=3, text=str(d["media_number"]))
 
     # write metadata in `tags` to file
     for k, v in tags.items():
+        if v is None:
+            continue
         id3tag = ID3_LEGEND[k]
         audio[id3tag.__name__] = id3tag(encoding=3, text=v)
 
