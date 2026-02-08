@@ -163,7 +163,9 @@ class QobuzDL:
                 skip_extras=True,
             )
         else:
-            items = [item[type_dict["iterable_key"]]["items"] for item in content][0]
+            items = [
+                x for page in content for x in page[type_dict["iterable_key"]]["items"]
+            ]
 
         logger.info(f"{YELLOW}{len(items)} downloads in queue")
         for i, item in enumerate(items, 1):
