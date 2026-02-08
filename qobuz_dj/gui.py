@@ -6,7 +6,10 @@ from PySide6.QtCore import QByteArray, QProcess
 from PySide6.QtGui import QColor, QFont, QTextCharFormat, QTextCursor
 from PySide6.QtWidgets import (
     QApplication,
+    QFileDialog,
     QHBoxLayout,
+    QLabel,
+    QLineEdit,
     QMainWindow,
     QPlainTextEdit,
     QPushButton,
@@ -80,7 +83,7 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("qobuz-dj GUI")
-        self.resize(800, 600)
+        self.resize(900, 700)
 
         self.process = QProcess(self)
         self.process.setProcessChannelMode(QProcess.MergedChannels)
@@ -93,8 +96,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central_widget)
         main_layout = QVBoxLayout(central_widget)
 
-        # Toolbar
-        button_layout = QHBoxLayout()
+        # Mode Buttons
+        mode_layout = QHBoxLayout()
         modes = [
             ("DJ Mode", "dj"),
             ("Download", "dl"),
@@ -106,34 +109,64 @@ class MainWindow(QMainWindow):
         for name, cmd in modes:
             btn = QPushButton(name)
             btn.clicked.connect(lambda checked, c=cmd: self.run_command(c))
-            button_layout.addWidget(btn)
+            mode_layout.addWidget(btn)
 
-        main_layout.addLayout(button_layout)
+        main_layout.addLayout(mode_layout)
+
+        # Input Field Layer
+        input_layout = QHBoxLayout()
+        input_layout.addWidget(QLabel("Source / Arguments:"))
+        self.source_input = QLineEdit()
+        self.source_input.setPlaceholderText("Enter URL, keywords, or folder path...")
+        input_layout.addWidget(self.source_input)
+
+        self.browse_btn = QPushButton("Browse Folder")
+        self.browse_btn.clicked.connect(self.browse_folder)
+        input_layout.addWidget(self.browse_btn)
+
+        main_layout.addLayout(input_layout)
 
         # Console
         self.console = ConsoleWidget()
         main_layout.addWidget(self.console)
+
+    def browse_folder(self):
+        folder = QFileDialog.getExistingDirectory(self, "Select Directory to Sanitize")
+        if folder:
+            self.source_input.setText(folder)
 
     def run_command(self, cmd):
         if self.process.state() != QProcess.NotRunning:
             self.console.append_ansi("\x1b[31mProcess already running...\x1b[0m\n")
             return
 
-        self.console.append_ansi(f"\x1b[32mRunning: qobuz-dj {cmd}\x1b[0m\n")
+        args_text = self.source_input.text().strip()
+        cli_args = [cmd]
+        if args_text:
+            # Simple split for multiple args, though URLs usually don't have spaces
+            # For complex paths with spaces, we rely on QProcess handling list args correctly
+            if cmd == "sz":
+                cli_args.append(args_text)
+            else:
+                # For lucky or dl, might be multiple URLs or keywords
+                cli_args.extend(args_text.split())
 
-        # In development, use uv run. In production, use the executable.
+        self.console.append_ansi(
+            f"\x1b[32mRunning: qobuz-dj {' '.join(cli_args)}\x1b[0m\n"
+        )
+
         if getattr(sys, "frozen", False):
             program = os.path.join(os.path.dirname(sys.executable), "qobuz-dj")
             if os.name == "nt":
                 program += ".exe"
+            # Fallback for dev if not found
+            if not os.path.exists(program):
+                program = "qobuz-dj"
         else:
             program = "uv"
-            args = ["run", "qobuz-dj", cmd]
+            cli_args = ["run", "qobuz-dj"] + cli_args
 
-        if not getattr(sys, "frozen", False):
-            self.process.start(program, args)
-        else:
-            self.process.start(program, [cmd])
+        self.process.start(program, cli_args)
 
     def read_output(self):
         data = self.process.readAllStandardOutput()
