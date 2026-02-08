@@ -128,6 +128,26 @@ qobuz-dl lucky jay z story of oj --type track --no-cover
 
 Run `qobuz-dl lucky --help` for more info.
 
+### DJ Mode
+Designed for DJs who need high quality MP3 files with consistent formatting.
+```
+qobuz-dl dl -D <url>
+```
+This mode automatically:
+* Sets quality to **MP3 320kbps**
+* Disables **quality fallback**
+* Enables **Smart Discography** (skips duplicates, prefers latest release)
+* **Embeds artwork** into the file (no separate `cover.jpg`)
+* Formats folders:
+    * Artist: `{artist} - {album} ({year})`
+    * Playlist: `.` (flattens into current directory)
+* Disables database check (always downloads)
+
+You can also use `-T <n>` to download only the **Top N** tracks of an artist in DJ Mode:
+```
+qobuz-dl dl -D -T 5 <artist_url>
+```
+
 ### Other
 Reset your config file
 ```
