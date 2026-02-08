@@ -29,7 +29,7 @@ if getattr(sys, "frozen", False):
     CONFIG_PATH = os.getcwd()
 else:
     # Installed mode: Use AppData/.config
-    CONFIG_PATH = os.path.join(OS_CONFIG, "qobuz-dl")
+    CONFIG_PATH = os.path.join(OS_CONFIG, "qobuz-dj")
 
 # Check CWD first (for installed mode override, or redundancy for portable)
 if os.path.isfile(os.path.join(os.getcwd(), "config.ini")):
@@ -77,7 +77,7 @@ def _reset_config(config_file):
     logging.info(
         f"{GREEN}Config file updated. Edit more options in {config_file}"
         "\nso you don't have to call custom flags every time you run "
-        "a qobuz-dl command."
+        "a qobuz-dj command."
     )
 
 
@@ -96,7 +96,9 @@ def _handle_commands(qobuz, arguments):
         return
 
     try:
-        if arguments.command == "dl":
+        if arguments.command in ("dl", "dj"):
+            if arguments.command == "dj":
+                arguments.dj = True
             qobuz.download_list_of_urls(arguments.SOURCE)
         elif arguments.command == "lucky":
             query = " ".join(arguments.QUERY)
@@ -162,7 +164,7 @@ def main():
         if not arguments.reset:
             sys.exit(
                 f"{RED}Your config file is corrupted: {error}! "
-                "Run 'qobuz-dl -r' to fix this."
+                "Run 'qobuz-dj -r' to fix this."
             )
 
     if arguments.command == "sz":
@@ -209,9 +211,9 @@ def main():
         folder_format=arguments.folder_format or folder_format,  # type: ignore
         track_format=arguments.track_format or track_format,  # type: ignore
         smart_discography=arguments.smart_discography or smart_discography,  # type: ignore
-        dj_mode=arguments.dj,
+        dj_mode=arguments.dj or arguments.command == "dj",
     )
-    if arguments.dj:
+    if arguments.dj or arguments.command == "dj":
         qobuz.quality = 5
         qobuz.quality_fallback = False
         # Only disable DB if not forced by --db

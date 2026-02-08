@@ -37,17 +37,17 @@ jobs:
       - name: Rename binary (Unix)
         if: matrix.os != 'windows-latest'
         run: |
-          mv dist/qobuz-dl dist/qobuz-dl-${{ matrix.os }}
+          mv dist/qobuz-dj dist/qobuz-dj-${{ matrix.os }}
         shell: bash
 
       - name: Rename binary (Windows)
         if: matrix.os == 'windows-latest'
         run: |
-          mv dist/qobuz-dl.exe dist/qobuz-dl-windows.exe
+          mv dist/qobuz-dj.exe dist/qobuz-dj-windows.exe
         shell: bash
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: qobuz-dl-binaries-${{ matrix.os }}
-          path: dist/qobuz-dl-*
+          name: qobuz-dj-binaries-${{ matrix.os }}
+          path: dist/qobuz-dj-*
