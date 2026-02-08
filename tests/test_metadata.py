@@ -1,4 +1,5 @@
 from unittest.mock import patch
+
 from qobuz_dl.metadata import _format_genres, get_safe
 
 
@@ -37,3 +38,23 @@ def test_get_safe_logging(mock_log):
     data = {}
     get_safe(data, ["missing"], "default", context_id="ctx")
     mock_log.assert_called_once_with("ctx", "missing", "default")
+
+
+# --- Format tests ---
+
+from qobuz_dl.metadata import _format_copyright
+
+
+def test_format_genres_list():
+    genres = ["Rock/Pop", "Rock"]
+    assert _format_genres(genres) == "Rock, Pop"
+
+
+def test_format_genres_empty():
+    assert _format_genres([]) == ""
+
+
+def test_format_copyright():
+    assert _format_copyright("(P) 2023 Label") == "\u2117 2023 Label"
+    assert _format_copyright("(C) 2023 Label") == "\u00a9 2023 Label"
+    assert _format_copyright(None) is None

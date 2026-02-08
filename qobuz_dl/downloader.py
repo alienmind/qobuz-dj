@@ -7,7 +7,7 @@ from pathvalidate import sanitize_filename, sanitize_filepath
 from tqdm import tqdm
 
 import qobuz_dl.metadata as metadata
-from qobuz_dl.color import OFF, GREEN, RED, YELLOW, CYAN
+from qobuz_dl.color import CYAN, GREEN, OFF, RED, YELLOW
 from qobuz_dl.exceptions import NonStreamable
 
 QL_DOWNGRADE = "FormatRestrictedByFormatAvailability"
@@ -425,13 +425,10 @@ def _safe_get(d: dict, *keys, default=None):
     'baz'
     """
     curr = d
-    res = default
     for key in keys:
         if not isinstance(curr, dict):
             return default
-        res = curr.get(key, default)
-        if res == default or not hasattr(res, "__getitem__"):
-            return res
-        else:
-            curr = res
-    return res
+        curr = curr.get(key, default)
+        if curr is default:
+            return default
+    return curr
