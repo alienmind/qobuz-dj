@@ -3,11 +3,14 @@ Search, explore and download Lossless and Hi-Res music from [Qobuz](https://www.
 **This is a maintained fork of [vitiko98/qobuz-dl](https://github.com/vitiko98/qobuz-dl), optimized for DJs and modern python environments.**
 
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VZWSWVGZGJRMU&source=url)  
-*(You can donate to vitiko98 the original author of qobuz-dl - I don't have any economic interest)*
+*(You can donate to vitiko98 the original author of qobuz-dl - I don't take any donations)*
+
+## Improvements over original qobuz-dl
+*   **DJ-Focused Workflow**: Specialized **DJ Mode** (`-D`) and handy scripts (`qbdl.bat` / `qbdl.sh`) automating high-quality MP3 downloads (320kbps) with embedded art and smart folder organization.
+*   **Modern Robustness**: Built on **Python 3.13** and managed by **uv** for lightning-fast setups. Codebase is hardened with **Ruff** linting, **Pyright** static analysis, and a comprehensive test suite to ensure stability.
+*   **Smart Logic**: improved handling of duplicates (preferring latest releases), better playlist support, and automatic "Top Tracks" downloading.
 
 ## Features
-* **DJ-Ready Downloads**: Automatic MP3 320kbps, proper tagging, and Smart Discography (clean folders, no duplicates).
-* **Modern Stack**: Support for `uv`, updated dependencies, and robust wrappers.
 * Download FLAC and MP3 files from Qobuz
 * Explore and download music directly from your terminal with **interactive** or **lucky** mode
 * Download albums, tracks, artists, playlists and labels with **download** mode
