@@ -4,21 +4,21 @@ MODE="$1"
 shift
 
 if [ "$MODE" == "dla" ]; then
-    CMD_FLAGS="dl -q 5 --no-fallback -s --no-db"
+    CMD_FLAGS="dl -q 5 --no-fallback -s --no-db --folder-format \"{artist} - {album} ({year})\""
     echo "[INFO] Mode: Artist/Album (Smart Discography, No Flattening)"
 elif [ "$MODE" == "dlp" ]; then
     CMD_FLAGS="dl -q 5 --no-fallback --no-db --folder-format ."
     echo "[INFO] Mode: Playlist (Flattening, No Smart Discography)"
 elif [ "$MODE" == "dl" ]; then
     if [[ "$PARAMS" == *"/artist/"* ]]; then
-        CMD_FLAGS="dl -q 5 --no-fallback -s --no-db"
+        CMD_FLAGS="dl -q 5 --no-fallback -s --no-db --folder-format \"{artist} - {album} ({year})\""
         echo "[INFO] Mode: Auto-detected Artist/Album (Smart Discography, No Flattening)"
     elif [[ "$PARAMS" == *"/playlist/"* ]]; then
         CMD_FLAGS="dl -q 5 --no-fallback --no-db --folder-format ."
         echo "[INFO] Mode: Auto-detected Playlist (Flattening, No Smart Discography)"
     else
         echo "[WARNING] Could not detect type from URL. Defaulting to Artist/Album..."
-        CMD_FLAGS="dl -q 5 --no-fallback -s --no-db"
+        CMD_FLAGS="dl -q 5 --no-fallback -s --no-db --folder-format \"{artist} - {album} ({year})\""
     fi
 else
     echo "[ERROR] Invalid mode. Use 'dla' for Artist/Album or 'dlp' for Playlist."
