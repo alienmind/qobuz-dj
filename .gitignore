@@ -7,3 +7,4 @@ build/
 ruff_errors.txt
 downloads.db
 *.log
+MP3/
