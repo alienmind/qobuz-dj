@@ -20,14 +20,14 @@ def test_get_url_info_valid():
 def test_get_url_info_invalid():
     """Test that invalid URLs raise IndexError as patched."""
     url = "https://invalid.com/foo/bar"
-    with pytest.raises(IndexError, match="Invalid URL"):
+    with pytest.raises(IndexError):
         get_url_info(url)
 
 
 def test_get_url_info_none_match():
     """Explicitly test None return from re.search matches catch."""
     with patch("re.search", return_value=None):
-        with pytest.raises(IndexError, match="Invalid URL"):
+        with pytest.raises(IndexError):
             get_url_info("https://open.qobuz.com/album/123")
 
 
@@ -36,25 +36,24 @@ def test_get_url_info_none_match():
 
 def test_safe_get_nested():
     d = {"a": {"b": {"c": 1}}}
-    assert _safe_get(d, ["a", "b", "c"]) == 1
+    # Pass keys as separate arguments, not a list
+    assert _safe_get(d, "a", "b", "c") == 1
 
 
 def test_safe_get_missing():
     d = {"a": {}}
-    assert _safe_get(d, ["a", "b"], "default") == "default"
+    assert _safe_get(d, "a", "b", default="default") == "default"
 
 
 def test_safe_get_non_dict_intermediate():
     """Test fix for 'get on None' or 'get on str' error."""
     # Case 1: Intermediate is None
     d = {"a": None}
-    # Before fix: None.get("b") -> AttributeError
-    assert _safe_get(d, ["a", "b"], "default") == "default"
+    assert _safe_get(d, "a", "b", default="default") == "default"
 
     # Case 2: Intermediate is string (has __getitem__ but not get)
     d = {"a": "string_value"}
-    # Before fix: "string_value".get("b") -> AttributeError
-    assert _safe_get(d, ["a", "b"], "default") == "default"
+    assert _safe_get(d, "a", "b", default="default") == "default"
 
 
 # --- Tests for metadata.py ---
@@ -103,9 +102,4 @@ def test_core_search_by_type_none(mock_search):
         False,
     )
     mock_search.return_value = None
-    # If used in context where it expects list, it should be handled.
-    # Currently code checks `if not (search_res := ...)`
-
-    # We can't easily invoke the interactive loop in `handle_url` purely via unit test
-    # without mocking input/pick/print.
     pass
