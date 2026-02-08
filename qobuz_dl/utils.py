@@ -53,11 +53,14 @@ def make_m3u(pl_directory):
         if not audio_files or len(audio_files) != len(audio_rel_files):
             continue
 
-        for audio_rel_file, audio_file in zip(audio_rel_files, audio_files):
+        for audio_rel_file, audio_file in zip(
+            audio_rel_files, audio_files, strict=True
+        ):
             try:
                 pl_item = (
                     EasyMP3(audio_file) if ".mp3" in audio_file else FLAC(audio_file)
                 )
+
                 title = pl_item["TITLE"][0]
                 artist = pl_item["ARTIST"][0]
                 length = int(pl_item.info.length)
@@ -133,7 +136,13 @@ def smart_discography_filter(
         )
         remaster_exists = any(is_type("remaster", a) for a in albums)
 
-        def is_valid(album: dict) -> bool:
+        def is_valid(
+            album: dict,
+            best_bit_depth=best_bit_depth,
+            best_sampling_rate=best_sampling_rate,
+            remaster_exists=remaster_exists,
+        ) -> bool:
+            """Check if album is of type `album_t`"""
             return (
                 album["maximum_bit_depth"] == best_bit_depth
                 and album["maximum_sampling_rate"] == best_sampling_rate
