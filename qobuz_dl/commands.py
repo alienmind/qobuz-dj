@@ -128,7 +128,13 @@ def add_common_arg(custom_parser, default_folder, default_quality):
         albums, high bit depth/dynamic range, and low sampling rates (to save space).""",
     )
     custom_parser.add_argument(
-        "-t",
+        "-D",
+        "--dj",
+        action="store_true",
+        help="DJ Mode: high quality MP3 (320), no fallback, smart discography, and custom folder naming.",
+    )
+    custom_parser.add_argument(
+        "-T",
         "--top",
         metavar="int",
         const=5,

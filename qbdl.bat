@@ -7,23 +7,19 @@ set "params=%*"
 REM Remove the first argument (mode)
 for /f "tokens=1,* delims= " %%a in ("%*") do set "params=%%b"
 
-if "%mode%"=="dla" (
-    set "cmd_flags=dl -q 5 --no-fallback -s --no-db"
-    echo [INFO] Mode: Artist/Album ^(Smart Discography, No Flattening^)
+if "%mode%"=="dl" (
+    echo [INFO] DJ Mode enabled: MP3 320kbps, Smart Discography, No DB, No Fallback, Embedded Art
 ) else (
-    if "%mode%"=="dlp" (
-        set "cmd_flags=dl -q 5 --no-fallback --no-db --folder-format ."
-        echo [INFO] Mode: Playlist ^(Flattening, No Smart Discography^)
-    ) else (
-        echo [ERROR] Invalid mode. Use 'dla' for Artist/Album or 'dlp' for Playlist.
-        exit /b 1
-    )
+    echo [ERROR] Invalid mode. Use 'dl' for DJ Mode.
+    exit /b 1
 )
+
+set "cmd_flags=dl -D"
 
 where uv >nul 2>nul
 if %errorlevel% equ 0 (
     echo [INFO] Using uv...
-    uv run qobuz-dl %cmd_flags% %params%
+    uv run python -m qobuz_dl %cmd_flags% %params%
     exit /b %errorlevel%
 )
 
@@ -33,13 +29,13 @@ if %errorlevel% equ 0 (
     where uv >nul 2>nul
     if %errorlevel% equ 0 (
         echo [INFO] Using uv inside mamba...
-        uv run qobuz-dl %cmd_flags% %params%
+        uv run python -m qobuz_dl %cmd_flags% %params%
     ) else (
         echo [INFO] Using qobuz-dl directly inside mamba...
-        qobuz-dl %cmd_flags% %params%
+        python -m qobuz_dl %cmd_flags% %params%
     )
     exit /b %errorlevel%
 )
 
 echo [INFO] mamba not found or failed. Trying qobuz-dl directly...
-qobuz-dl %cmd_flags% %params%
+python -m qobuz_dl %cmd_flags% %params%

@@ -51,6 +51,7 @@ class QobuzDL:
         folder_format="{artist} - {album} ({year}) [{bit_depth}B-{sampling_rate}kHz]",
         track_format="{tracknumber}. {tracktitle}",
         smart_discography=False,
+        dj_mode=False,
     ):
         self.directory = create_and_return_dir(directory)
         self.quality = quality
@@ -68,6 +69,7 @@ class QobuzDL:
         self.track_format = track_format
         self.track_format = track_format
         self.smart_discography = smart_discography
+        self.dj_mode = dj_mode
         self.top_tracks = None  # Will be set by cli.py
 
     def initialize_client(self, email, pwd, app_id, secrets):
@@ -81,7 +83,7 @@ class QobuzDL:
             secret for secret in bundle.get_secrets().values() if secret
         ]  # avoid empty fields
 
-    def download_from_id(self, item_id, album=True, alt_path=None):
+    def download_from_id(self, item_id, album=True, alt_path=None, track_count=None):
         if handle_download_id(self.downloads_db, item_id, add_id=False):
             logger.info(
                 f"{OFF}This release ID ({item_id}) was already downloaded "
@@ -102,6 +104,7 @@ class QobuzDL:
                 self.no_cover,
                 self.folder_format,
                 self.track_format,
+                track_count=track_count,
             )
             dloader.download_id_by_type(not album)
             handle_download_id(self.downloads_db, item_id, add_id=True)
@@ -143,31 +146,40 @@ class QobuzDL:
                 os.path.join(self.directory, sanitize_filename(content_name))
             )
 
-        if self.smart_discography and url_type == "artist":
+        if self.dj_mode:
+            if url_type == "artist":
+                self.folder_format = "{artist} - {album} ({year})"
+            elif url_type == "playlist":
+                self.folder_format = "."
+
+        if url_type == "artist" and self.top_tracks:
+            items = self.client.get_artist_top_tracks(item_id, self.top_tracks)
+            logger.info(f"{YELLOW}Downloading top {len(items)} tracks...")
+        elif self.smart_discography and url_type == "artist":
             # change `save_space` and `skip_extras` for customization
             items = smart_discography_filter(
                 content,
                 save_space=True,
                 skip_extras=True,
             )
-        elif not self.smart_discography and url_type == "artist" and self.top_tracks:
-            items = self.client.get_artist_top_tracks(item_id, self.top_tracks)
-            logger.info(f"{YELLOW}Downloading top {len(items)} tracks...")
         else:
             items = [item[type_dict["iterable_key"]]["items"] for item in content][0]
 
         logger.info(f"{YELLOW}{len(items)} downloads in queue")
-        for item in items:
+        for i, item in enumerate(items, 1):
             self.download_from_id(
                 item["id"],
                 True
                 if type_dict["iterable_key"] == "albums" and not self.top_tracks
                 else False,
                 new_path,
+                track_count=i if url_type == "playlist" else None,
             )
         if url_type == "playlist" and not self.no_m3u_for_playlists:
             make_m3u(new_path)
-        else:
+        elif not type_dict["func"]:
+            # Only for types that don't have a func (album, track)
+            # artist/label/playlist have func and are handled in the loop above
             self.download_from_id(item_id, type_dict["album"])
 
     def download_list_of_urls(self, urls):
@@ -386,12 +398,12 @@ class QobuzDL:
             f"{YELLOW}Downloading playlist: {pl_title} ({len(track_list)} tracks)"
         )
 
-        for i in track_list:
-            track_id = get_url_info(self.search_by_type(i, "track", 1, lucky=True)[0])[
-                1
-            ]
+        for i, track_name in enumerate(track_list, 1):
+            track_id = get_url_info(
+                self.search_by_type(track_name, "track", 1, lucky=True)[0]
+            )[1]
             if track_id:
-                self.download_from_id(track_id, False, pl_directory)
+                self.download_from_id(track_id, False, pl_directory, track_count=i)
 
         if not self.no_m3u_for_playlists:
             make_m3u(pl_directory)

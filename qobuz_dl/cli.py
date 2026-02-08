@@ -176,7 +176,19 @@ def main():
         folder_format=arguments.folder_format or folder_format,
         track_format=arguments.track_format or track_format,
         smart_discography=arguments.smart_discography or smart_discography,
+        dj_mode=arguments.dj,
     )
+    if arguments.dj:
+        qobuz.quality = 5
+        qobuz.quality_fallback = False
+        qobuz.downloads_db = None
+        qobuz.smart_discography = True
+        qobuz.embed_art = True
+        qobuz.no_cover = True
+        logging.info(
+            f"{YELLOW}DJ Mode enabled: MP3 320, No Fallback, Smart Discography, No DB, Embedded Art"
+        )
+    qobuz.top_tracks = arguments.top
     qobuz.initialize_client(email, password, app_id, secrets)
 
     _handle_commands(qobuz, arguments)

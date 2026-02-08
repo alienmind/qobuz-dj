@@ -90,14 +90,6 @@ def smart_discography_filter(
     :returns: filtered items list
     """
 
-    # for debugging
-    def print_album(album: dict) -> None:
-        logger.debug(
-            f"{album['title']} - {album.get('version', '~~')} "
-            "({album['maximum_bit_depth']}/{album['maximum_sampling_rate']}"
-            " by {album['artist']['name']}) {album['id']}"
-        )
-
     TYPE_REGEXES = {
         "remaster": r"(?i)(re)?master(ed)?",
         "extra": r"(?i)(anniversary|deluxe|live|collector|demo|expanded)",
@@ -152,16 +144,19 @@ def smart_discography_filter(
                 )
             )
 
-        filtered = sorted(
+        sorted_albums = sorted(
             filter(is_valid, albums),
             key=lambda x: x.get("release_date_original", "0000-00-00"),
             reverse=True,
         )
+
+        filtered = sorted_albums
         # most of the time, len is 0 or 1.
         # if greater, it is a complete duplicate,
         # so it doesn't matter which is chosen
         if len(filtered) >= 1:
-            items.append(filtered[0])
+            selected = filtered[0]
+            items.append(selected)
 
     return items
 
