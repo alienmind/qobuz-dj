@@ -470,6 +470,7 @@ version = "1.0.0a2"
 source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
+    { name = "colorama" },
     { name = "mutagen" },
     { name = "pathvalidate" },
     { name = "pick" },
@@ -491,6 +492,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.14.3" },
+    { name = "colorama", specifier = ">=0.4.6" },
     { name = "mutagen", specifier = ">=1.47.0" },
     { name = "pathvalidate", specifier = ">=3.3.1" },
     { name = "pick", specifier = ">=2.4.0" },

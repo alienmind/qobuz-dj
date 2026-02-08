@@ -2,7 +2,7 @@ import os
 import re
 import sys
 
-from PySide6.QtCore import QByteArray, QProcess
+from PySide6.QtCore import QByteArray, QProcess, Qt
 from PySide6.QtGui import QColor, QFont, QTextCharFormat, QTextCursor
 from PySide6.QtWidgets import (
     QApplication,
@@ -77,6 +77,18 @@ class ConsoleWidget(QPlainTextEdit):
 
         self.setTextCursor(cursor)
         self.ensureCursorVisible()
+
+    def keyPressEvent(self, event):
+        # Forward key events to the MainWindow's QProcess
+        main_win = self.window()
+        if hasattr(main_win, "send_input"):
+            key = event.text()
+            if event.key() == Qt.Key_Return or event.key() == Qt.Key_Enter:
+                key = "\n"
+
+            if key:
+                main_win.send_input(key)
+        # We don't call super().keyPressEvent(event) to keep it read-only
 
 
 class MainWindow(QMainWindow):
@@ -172,6 +184,10 @@ class MainWindow(QMainWindow):
         data = self.process.readAllStandardOutput()
         text = str(QByteArray(data), "utf-8", errors="replace")
         self.console.append_ansi(text)
+
+    def send_input(self, text):
+        if self.process.state() == QProcess.Running:
+            self.process.write(text.encode("utf-8"))
 
 
 def main():
