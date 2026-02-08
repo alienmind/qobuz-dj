@@ -1,5 +1,3 @@
-import os
-import pytest
 from qobuz_dl.utils import make_m3u
 
 
@@ -15,7 +13,7 @@ def test_make_m3u_utf8_encoding(tmp_path):
     # make_m3u iterates os.listdir and reads metadata using mutagen.File.
     # This is hard to test without real files or mocking mutagen.File.
 
-    from unittest.mock import patch, MagicMock
+    from unittest.mock import patch
 
     # We need to patch EasyMP3 since make_m3u uses it
     with patch("qobuz_dl.utils.EasyMP3") as mock_mp3:
@@ -37,3 +35,33 @@ def test_make_m3u_utf8_encoding(tmp_path):
     # Read to verify encoding
     content = m3u_file.read_text(encoding="utf-8")
     assert "Song \u2665" in content
+
+
+# --- get_url_info tests ---
+
+from unittest.mock import patch
+
+import pytest
+
+from qobuz_dl.utils import get_url_info
+
+
+def test_get_url_info_valid():
+    url = "https://open.qobuz.com/album/123456"
+    type_, id_ = get_url_info(url)
+    assert type_ == "album"
+    assert id_ == "123456"
+
+
+def test_get_url_info_invalid():
+    """Test that invalid URLs raise IndexError as patched."""
+    url = "https://invalid.com/foo/bar"
+    with pytest.raises(IndexError):
+        get_url_info(url)
+
+
+def test_get_url_info_none_match():
+    """Explicitly test None return from re.search matches catch."""
+    with patch("re.search", return_value=None):
+        with pytest.raises(IndexError):
+            get_url_info("https://open.qobuz.com/album/123")

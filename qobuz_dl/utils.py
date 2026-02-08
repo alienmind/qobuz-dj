@@ -23,11 +23,11 @@ class PartialFormatter(string.Formatter):
             val = None, field_name
         return val
 
-    def format_field(self, value, spec):
+    def format_field(self, value, format_spec):
         if not value:
             return self.missing
         try:
-            return super(PartialFormatter, self).format_field(value, spec)
+            return super(PartialFormatter, self).format_field(value, format_spec)
         except ValueError:
             if self.bad_fmt:
                 return self.bad_fmt
@@ -105,19 +105,21 @@ def smart_discography_filter(
         regex = TYPE_REGEXES[album_t]
         return re.search(regex, f"{title} {version}") is not None
 
-    def essence(album: dict) -> str:
+    def essence(title: str) -> str:
         """Ignore text in parens/brackets, return all lowercase.
         Used to group two albums that may be named similarly, but not exactly
         the same.
         """
-        r = re.match(r"([^\(]+)(?:\s*[\(\[][^\)][\)\]])*", album)
-        return r.group(1).strip().lower()
+        r = re.match(r"([^\(]+)(?:\s*[\(\[][^\)][\)\]])*", title)
+        if r:
+            return r.group(1).strip().lower()
+        return title.strip().lower()
 
     requested_artist = contents[0]["name"]
     items = [item["albums"]["items"] for item in contents][0]
 
     # use dicts to group duplicate albums together by title
-    title_grouped = dict()
+    title_grouped: dict[str, list[dict]] = {}
     for item in items:
         title_ = essence(item["title"])
         if title_ not in title_grouped:  # ?
@@ -195,4 +197,6 @@ def get_url_info(url):
         r"?\/(album|artist|track|playlist|label)(?:\/[-\w\d]+)?\/([\w\d]+)",
         url,
     )
+    if not r:
+        raise IndexError("Invalid URL")
     return r.groups()
