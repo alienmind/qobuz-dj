@@ -1,6 +1,6 @@
 [project]
 name = "qobuz-dj"
-version = "1.0.0-alpha1"
+version = "1.0.0-alpha2"
 requires-python = ">=3.10"
 dependencies = [
     "beautifulsoup4>=4.14.3",
