@@ -17,7 +17,7 @@ logging.basicConfig(
 )
 
 if os.name == "nt":
-    OS_CONFIG = os.environ.get("APPDATA")
+    OS_CONFIG = os.environ.get("APPDATA", "")
 else:
     OS_CONFIG = os.path.join(os.environ["HOME"], ".config")
 
@@ -166,16 +166,16 @@ def main():
     qobuz = QobuzDL(
         arguments.directory,
         arguments.quality,
-        arguments.embed_art or embed_art,
-        ignore_singles_eps=arguments.albums_only or albums_only,
-        no_m3u_for_playlists=arguments.no_m3u or no_m3u,
-        quality_fallback=not arguments.no_fallback or not no_fallback,
-        cover_og_quality=arguments.og_cover or og_cover,
-        no_cover=arguments.no_cover or no_cover,
-        downloads_db=None if no_database or arguments.no_db else QOBUZ_DB,
-        folder_format=arguments.folder_format or folder_format,
-        track_format=arguments.track_format or track_format,
-        smart_discography=arguments.smart_discography or smart_discography,
+        arguments.embed_art or embed_art,  # type: ignore
+        ignore_singles_eps=arguments.albums_only or albums_only,  # type: ignore
+        no_m3u_for_playlists=arguments.no_m3u or no_m3u,  # type: ignore
+        quality_fallback=not arguments.no_fallback or not no_fallback,  # type: ignore
+        cover_og_quality=arguments.og_cover or og_cover,  # type: ignore
+        no_cover=arguments.no_cover or no_cover,  # type: ignore
+        downloads_db=None if no_database or arguments.no_db else QOBUZ_DB,  # type: ignore
+        folder_format=arguments.folder_format or folder_format,  # type: ignore
+        track_format=arguments.track_format or track_format,  # type: ignore
+        smart_discography=arguments.smart_discography or smart_discography,  # type: ignore
         dj_mode=arguments.dj,
     )
     if arguments.dj:
