@@ -2,9 +2,9 @@ name: Build and Package
 
 on:
   push:
-    branches: [ master, 'release/**' ]
+    branches: [ main, 'release/**' ]
   pull_request:
-    branches: [ master ]
+    branches: [ main ]
   workflow_dispatch:
 
 jobs:
