@@ -8,6 +8,7 @@ import time
 
 import requests
 
+from qobuz_dl.color import GREEN, YELLOW
 from qobuz_dl.exceptions import (
     AuthenticationError,
     IneligibleError,
@@ -15,7 +16,6 @@ from qobuz_dl.exceptions import (
     InvalidAppSecretError,
     InvalidQuality,
 )
-from qobuz_dl.color import GREEN, YELLOW
 
 RESET = "Reset your credentials with 'qobuz-dl -r'"
 
@@ -53,25 +53,25 @@ class Client:
             params = {"album_id": kwargs["id"]}
         elif epoint == "playlist/get":
             params = {
-                "extra": "tracks",
+                "extra": kwargs.get("extra", "tracks"),
                 "playlist_id": kwargs["id"],
-                "limit": 500,
-                "offset": kwargs["offset"],
+                "limit": kwargs.get("limit", 500),
+                "offset": kwargs.get("offset", 0),
             }
         elif epoint == "artist/get":
             params = {
                 "app_id": self.id,
                 "artist_id": kwargs["id"],
-                "limit": 500,
-                "offset": kwargs["offset"],
-                "extra": "albums",
+                "limit": kwargs.get("limit", 500),
+                "offset": kwargs.get("offset", 0),
+                "extra": kwargs.get("extra", "albums"),
             }
         elif epoint == "label/get":
             params = {
                 "label_id": kwargs["id"],
-                "limit": 500,
-                "offset": kwargs["offset"],
-                "extra": "albums",
+                "limit": kwargs.get("limit", 500),
+                "offset": kwargs.get("offset", 0),
+                "extra": kwargs.get("extra", "albums"),
             }
         elif epoint == "favorite/getUserFavorites":
             unix = time.time()

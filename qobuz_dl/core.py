@@ -208,7 +208,17 @@ class QobuzDL:
 
         if url_type == "artist" and self.top_tracks:
             items = self.client.get_artist_top_tracks(item_id, self.top_tracks)
-            logger.info(f"{YELLOW}Downloading top {len(items)} tracks...")
+            # Use a dedicated folder for Top Tracks
+            artist_name = items[0]["album"]["artist"]["name"] if items else "Artist"
+            new_path = create_and_return_dir(
+                os.path.join(
+                    self.directory, f"{artist_name} - Top {self.top_tracks} Tracks"
+                )
+            )
+            # Override formats for single-folder organization
+            self.folder_format = "."
+            self.track_format = "{tracknumber}. {tracktitle}"
+            logger.info(f"{YELLOW}Downloading top {len(items)} tracks to {new_path}...")
         elif self.smart_discography and url_type == "artist":
             # change `save_space` and `skip_extras` for customization
             items = smart_discography_filter(

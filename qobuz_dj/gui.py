@@ -219,11 +219,16 @@ class MainWindow(QMainWindow):
         )
 
         if getattr(sys, "frozen", False):
-            program = os.path.join(os.path.dirname(sys.executable), "qobuz-dj")
-            if os.name == "nt":
-                program += ".exe"
-            if not os.path.exists(program):
-                program = "qobuz-dj"
+            # Check for OS-suffixed binaries first
+            bin_dir = os.path.dirname(sys.executable)
+            program = os.path.join(bin_dir, "qobuz-dj")
+
+            suffixes = ["-windows.exe", "-ubuntu-latest", "-macos-latest", ".exe", ""]
+            for suffix in suffixes:
+                path = os.path.join(bin_dir, f"qobuz-dj{suffix}")
+                if os.path.exists(path):
+                    program = path
+                    break
         else:
             program = "uv"
             cli_args = ["run", "qobuz-dj"] + cli_args
