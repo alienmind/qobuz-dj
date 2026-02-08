@@ -7,7 +7,7 @@ import time
 from mutagen.flac import FLAC
 from mutagen.mp3 import EasyMP3
 
-from qobuz_dl.color import RED, RESET, YELLOW
+from qobuz_dl.color import GREEN, RED, RESET, YELLOW
 
 logger = logging.getLogger(__name__)
 
@@ -194,7 +194,15 @@ def sanitize_directory(directory):
     from mutagen.mp3 import MP3
     from pathvalidate import sanitize_filename
 
+    # Strip potential quotes and normalization
+    directory = directory.strip("\"'")
+    directory = os.path.normpath(directory)
+
     logger.info(f"{YELLOW}Sanitizing directory: {directory}{RESET}")
+
+    if not os.path.isdir(directory):
+        logger.error(f"{RED}Error: {directory} is not a valid directory.{RESET}")
+        return
 
     mp3_files = []
     # Collect all mp3 files first to sort them
@@ -209,6 +217,7 @@ def sanitize_directory(directory):
     count = 0
     errors = 0
 
+    final_files = []
     for i, filepath in enumerate(mp3_files, 1):
         try:
             # Load ID3
@@ -235,11 +244,6 @@ def sanitize_directory(directory):
                     if year_tag:
                         year = str(year_tag[0])
                 year = str(year)[:4]
-            else:
-                # Fallback to filename parsing?
-                # Format: NN - Artist - Title (Year) or similar
-                # We can try to regex it if ID3 failed.
-                pass
 
             # Construct new name
             # NN - Artist - Title (Year).mp3
@@ -258,14 +262,35 @@ def sanitize_directory(directory):
                         f"Renamed: {os.path.basename(filepath)} -> {new_filename}"
                     )
                     count += 1
+                    final_files.append(new_filepath)
                 except OSError as e:
                     logger.error(f"{RED}Failed to rename {filepath}: {e}{RESET}")
                     errors += 1
+                    final_files.append(filepath)
+            else:
+                final_files.append(filepath)
         except Exception as e:
             logger.error(f"{RED}Error processing {filepath}: {e}{RESET}")
             errors += 1
+            final_files.append(filepath)
 
     logger.info(f"{YELLOW}Sanitized {count} files. Errors: {errors}.{RESET}")
+
+    # Create M3U playlist
+    if final_files:
+        # Use directory name for playlist, stripping any trailing separators
+        dir_name = os.path.basename(directory.rstrip(os.sep + (os.altsep or "")))
+        playlist_name = dir_name + ".m3u"
+        playlist_path = os.path.join(directory, playlist_name)
+        try:
+            with open(playlist_path, "w", encoding="utf-8") as f:
+                for fpath in final_files:
+                    # Write relative path for portability
+                    rel_path = os.path.relpath(fpath, directory)
+                    f.write(rel_path + "\n")
+            logger.info(f"{GREEN}Created playlist: {playlist_name}{RESET}")
+        except Exception as e:
+            logger.error(f"{RED}Failed to create playlist: {e}{RESET}")
 
 
 def get_url_info(url):

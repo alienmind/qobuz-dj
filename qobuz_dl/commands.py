@@ -55,6 +55,20 @@ def dl_args(subparsers):
     return download
 
 
+def sz_args(subparsers):
+    sz = subparsers.add_parser(
+        "sz",
+        description="Sanitize/rename MP3s in directory (sequential renumbering).",
+        help="sanitize mode",
+    )
+    sz.add_argument(
+        "directory",
+        metavar="PATH",
+        help="directory to sanitize",
+    )
+    return sz
+
+
 def add_common_arg(custom_parser, default_folder, default_quality):
     custom_parser.add_argument(
         "-d",
@@ -173,11 +187,6 @@ def qobuz_dl_args(default_quality=6, default_limit=20, default_folder="MP3"):
         help="rebuild database from downloaded files",
     )
     parser.add_argument(
-        "--sanitize-dir",
-        metavar="PATH",
-        help="sanitize/rename MP3s in directory (sequential renumbering)",
-    )
-    parser.add_argument(
         "--db",
         action="store_true",
         help="force database check (overrides -D default)",
@@ -192,6 +201,7 @@ def qobuz_dl_args(default_quality=6, default_limit=20, default_folder="MP3"):
     interactive = fun_args(subparsers, default_limit)
     download = dl_args(subparsers)
     lucky = lucky_args(subparsers)
+    sz_args(subparsers)
     [
         add_common_arg(i, default_folder, default_quality)
         for i in (interactive, download, lucky)

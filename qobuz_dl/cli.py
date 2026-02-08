@@ -24,8 +24,19 @@ if os.name == "nt":
 else:
     OS_CONFIG = os.path.join(os.environ["HOME"], ".config")
 
-CONFIG_PATH = os.path.join(OS_CONFIG, "qobuz-dl")
-CONFIG_FILE = os.path.join(CONFIG_PATH, "config.ini")
+if getattr(sys, "frozen", False):
+    # Portable mode: Always use CWD
+    CONFIG_PATH = os.getcwd()
+else:
+    # Installed mode: Use AppData/.config
+    CONFIG_PATH = os.path.join(OS_CONFIG, "qobuz-dl")
+
+# Check CWD first (for installed mode override, or redundancy for portable)
+if os.path.isfile(os.path.join(os.getcwd(), "config.ini")):
+    CONFIG_FILE = os.path.join(os.getcwd(), "config.ini")
+else:
+    CONFIG_FILE = os.path.join(CONFIG_PATH, "config.ini")
+
 QOBUZ_DB = os.path.join(os.getcwd(), "downloads.db")
 
 
@@ -84,10 +95,6 @@ def _handle_commands(qobuz, arguments):
         qobuz.rebuild_db()
         return
 
-    if arguments.sanitize_dir:
-        sanitize_directory(arguments.sanitize_dir)
-        return
-
     try:
         if arguments.command == "dl":
             qobuz.download_list_of_urls(arguments.SOURCE)
@@ -124,6 +131,7 @@ def main():
 
     config = configparser.ConfigParser()
     config.read(CONFIG_FILE)
+    no_database = False
 
     try:
         email = config["DEFAULT"]["email"]
@@ -156,6 +164,10 @@ def main():
                 f"{RED}Your config file is corrupted: {error}! "
                 "Run 'qobuz-dl -r' to fix this."
             )
+
+    if arguments.command == "sz":
+        sanitize_directory(arguments.directory)
+        sys.exit()
 
     if arguments.reset:
         sys.exit(_reset_config(CONFIG_FILE))
