@@ -387,7 +387,8 @@ class QobuzDL:
         track_list = []
         if len(artists) == len(titles) and artists:
             track_list = [
-                artist + " " + title for artist, title in zip(artists, titles)
+                artist + " " + title
+                for artist, title in zip(artists, titles, strict=True)
             ]
 
         if not track_list:
