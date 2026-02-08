@@ -211,6 +211,11 @@ def qobuz_dj_args(default_quality=6, default_limit=20, default_folder="MP3"):
         action="store_true",
         help="force database check (overrides -D default)",
     )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="download Qobuz API docs to disk for debugging",
+    )
 
     subparsers = parser.add_subparsers(
         title="commands",

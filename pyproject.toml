@@ -51,6 +51,7 @@ dev = [
     "pytest>=9.0.2",
     "ruff>=0.15.0",
     "types-requests>=2.32.4.20260107",
+    "types-tqdm>=4.67.0.20241221",
     "poethepoet>=0.24.0",
     "pyinstaller>=6.4.0",
 ]

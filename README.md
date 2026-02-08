@@ -96,5 +96,20 @@ This project uses `poethepoet` for automation.
 - `uv run poe test`: Run the test suite.
 - `uv run poe build`: Compile your own standalone executable.
 
-## Disclaimer
-This tool is for educational purposes. Please respect the [Qobuz API Terms of Use](https://static.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf). Not affiliated with Qobuz.
+## Disclaimer & Legal
+
+I will not be responsible for how you use qobuz-dj.
+
+**This tool DOES NOT include...**
+- Code to bypass Qobuz's region restrictions.
+- Qobuz app IDs or secrets.
+
+qobuz-dj does not publish any of Qobuz's private secrets or app IDs. It contains regular expressions and other code to dynamically grab them from Qobuz's web player's publicly available JavaScript, which is not rehosted, but grabbed client side. Scraping public data is not a violation of the Computer Fraud and Abuse Act (USA) according to the Ninth Court of Appeals, case # 17-16783 (see page 29).
+
+qobuz-dj uses the Qobuz API, but is not endorsed, certified or otherwise approved in any way by Qobuz.
+
+Qobuz brand and name is the registered trademark of its respective owner.
+
+qobuz-dj has no partnership, sponsorship or endorsement with Qobuz.
+
+By using qobuz-dj, you agree to the following: http://static.qobuz.com/apps/api/QobuzAPI-TermsofUse.pdf

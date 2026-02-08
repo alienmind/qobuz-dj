@@ -187,13 +187,35 @@ def main():
             pass
         sys.exit(f"{GREEN}The database was deleted.")
 
+    if arguments.debug:
+        import json
+
+        from qobuz_dj.qopy import Client
+
+        if "email" not in dir() or "password" not in dir():
+            sys.exit(f"{RED}Config not loaded. Run 'qobuz-dj -r' first.")
+
+        docs_url = "https://www.qobuz.com/api.json/0.2/docs"
+        logging.info(f"{YELLOW}Fetching API docs from {docs_url}...")
+        try:
+            client = Client(email, password, app_id, secrets)  # type: ignore
+            r = client.session.get(docs_url)
+            r.raise_for_status()
+            debug_path = os.path.join(os.getcwd(), "qobuz_api_docs.json")
+            with open(debug_path, "w", encoding="utf-8") as f:
+                json.dump(r.json(), f, indent=2)
+            logging.info(f"{GREEN}API docs saved to {debug_path}")
+        except Exception as e:
+            logging.error(f"{RED}Failed to fetch API docs: {e}")
+        sys.exit()
+
     # Determine DB path
     # If explicit --db: use QOBUZ_DB
     # Else if explicit --no-db or config "no_database": None
     # Else: QOBUZ_DB
-    if arguments.db:
+    if getattr(arguments, "db", False):
         db_path = QOBUZ_DB
-    elif arguments.no_db or no_database:
+    elif getattr(arguments, "no_db", False) or no_database:
         db_path = None
     else:
         db_path = QOBUZ_DB

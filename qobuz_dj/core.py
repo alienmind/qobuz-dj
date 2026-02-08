@@ -239,7 +239,7 @@ class QobuzDL:
                 if type_dict["iterable_key"] == "albums" and not self.top_tracks
                 else False,
                 new_path,
-                track_count=i if url_type == "playlist" else None,
+                track_count=i if (url_type == "playlist" or self.top_tracks) else None,
             )
         if url_type == "playlist" and not self.no_m3u_for_playlists:
             make_m3u(new_path)
