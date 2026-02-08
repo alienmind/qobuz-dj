@@ -1,9 +1,12 @@
 # qobuz-dl
-Search, explore and download Lossless and Hi-Res music from [Qobuz](https://www.qobuz.com/). It *just works*™ (2025).
+Search, explore and download Lossless and Hi-Res music from [Qobuz](https://www.qobuz.com/).
+**This is a maintained fork of [vitiko98/qobuz-dl](https://github.com/vitiko98/qobuz-dl), optimized for DJs and modern python environments.**
+
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VZWSWVGZGJRMU&source=url)
 
 ## Features
-
+* **DJ-Ready Downloads**: Automatic MP3 320kbps, proper tagging, and Smart Discography (clean folders, no duplicates).
+* **Modern Stack**: Support for `uv`, updated dependencies, and robust wrappers.
 * Download FLAC and MP3 files from Qobuz
 * Explore and download music directly from your terminal with **interactive** or **lucky** mode
 * Download albums, tracks, artists, playlists and labels with **download** mode
@@ -20,33 +23,48 @@ Search, explore and download Lossless and Hi-Res music from [Qobuz](https://www.
 
 > You'll need an **active subscription**
 
-#### Development with uv (Recommended)
-This project uses `uv` for dependency management.
+### Installation with uv (Recommended)
+This project is optimized for **[uv](https://github.com/astral/uv)**, a fast Python package installer and resolver.
 
-1. Install [uv](https://github.com/astral/uv).
-2. Run the tool:
-   ```bash
-   uv run qobuz-dl
-   ```
+1.  **Run directly** (no installation required):
+    ```bash
+    uv run qobuz-dl
+    ```
 
-#### Install qobuz-dl with pip
-##### Linux / MAC OS
+2.  **Or install as a tool** (to use `qobuz-dl` globally):
+    ```bash
+    uv tool install .
+    ```
+
+### Handy Scripts (DJ-Ready)
+For the best experience, especially for **DJs**, use the provided wrapper scripts (`qbdl.bat` for Windows, `qbdl.sh` for Linux/macOS).
+They handle environment setup and provide smart defaults tailored for building a clean music library.
+
+**Usage:**
+```bash
+# Windows
+qbdl.bat dl <url>
+
+# Linux / macOS
+./qbdl.sh dl <url>
 ```
-pip3 install --upgrade qobuz-dl
-```
-##### Windows
-```
-pip3 install windows-curses
-pip3 install --upgrade qobuz-dl
-```
-#### Run qobuz-dl and enter your credentials
-##### Linux / MAC OS
-```
-qobuz-dl
-```
-##### Windows
-```
-qobuz-dl.exe
+
+**Smart Auto-Detection (`dl`):**
+The scripts automatically detect the content type:
+*   **Artist/Album**: Downloads to `{Artist} - {Album} ({Year})` folders.
+*   **Playlist**: Flattens downloads to the current directory (perfect for dragging into DJ software/USB sticks).
+
+**Top Tracks & DJ Mode:**
+Pass `-D` (DJ Mode) for high-quality MP3s with embedded art (no loose files), or `-T <n>` for top tracks:
+```bash
+# Download Top 5 tracks of an artist in DJ Mode (MP3 320, clean tags)
+qbdl.bat dl -D -T 5 <artist_url>
+
+# Download a playlist flattened for USB stick
+qbdl.bat dl -D <playlist_url>
+
+# Download standard discography but exclude duplicates (Smart Mode is on by default in scripts)
+qbdl.bat dl <artist_url>
 ```
 
 > If something fails, run `qobuz-dl -r` to reset your config file.
