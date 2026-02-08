@@ -67,10 +67,7 @@ This project is optimized for **[uv](https://github.com/astral/uv)**, a fast Pyt
     ```
 
 3.  **Standalone Executable**:
-    Download the pre-compiled binary from the releases page (if available) or build your own with `uv run poe build`.
-
-### Standalone Executable
-Download the pre-compiled binary from the releases page (if available) or build your own with `uv run poe build`.
+    Download the pre-compiled binary from the **GitHub Actions** artifacts for the latest build (Windows, Linux, macOS) or build your own with `uv run poe build`.
 
 ---
 
