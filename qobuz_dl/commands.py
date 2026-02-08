@@ -173,6 +173,11 @@ def qobuz_dl_args(default_quality=6, default_limit=20, default_folder="MP3"):
         help="rebuild database from downloaded files",
     )
     parser.add_argument(
+        "--sanitize-dir",
+        metavar="PATH",
+        help="sanitize/rename MP3s in directory (sequential renumbering)",
+    )
+    parser.add_argument(
         "--db",
         action="store_true",
         help="force database check (overrides -D default)",

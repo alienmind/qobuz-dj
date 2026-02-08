@@ -1,11 +1,13 @@
+import logging
+import os
 import re
 import string
-import os
-import logging
 import time
 
-from mutagen.mp3 import EasyMP3
 from mutagen.flac import FLAC
+from mutagen.mp3 import EasyMP3
+
+from qobuz_dl.color import RED, RESET, YELLOW
 
 logger = logging.getLogger(__name__)
 
@@ -180,6 +182,90 @@ def create_and_return_dir(directory):
     fix = os.path.normpath(directory)
     os.makedirs(fix, exist_ok=True)
     return fix
+
+
+def sanitize_directory(directory):
+    """
+    Recursively sanitizes MP3 filenames in a directory.
+    Renames to: {NN} - {Artist} - {Title} ({Year}).mp3
+    Renumbers sequentially across all files found.
+    """
+    from mutagen.id3 import ID3
+    from mutagen.mp3 import MP3
+    from pathvalidate import sanitize_filename
+
+    logger.info(f"{YELLOW}Sanitizing directory: {directory}{RESET}")
+
+    mp3_files = []
+    # Collect all mp3 files first to sort them
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if file.lower().endswith(".mp3"):
+                mp3_files.append(os.path.join(root, file))
+
+    # Sort files to ensure deterministic order (by path)
+    mp3_files.sort()
+
+    count = 0
+    errors = 0
+
+    for i, filepath in enumerate(mp3_files, 1):
+        try:
+            # Load ID3
+            try:
+                audio = MP3(filepath, ID3=ID3)
+            except Exception:
+                audio = None
+
+            # Extract Metadata (ID3 Priority)
+            artist = "Unknown Artist"
+            title = "Unknown Title"
+            year = "0000"
+
+            if audio and audio.tags:
+                artist = str(audio.tags.get("TPE1", [artist])[0])
+                title = str(audio.tags.get("TIT2", [title])[0])
+
+                # Year
+                dr_tag = audio.tags.get("TDRC")
+                if dr_tag:
+                    year = str(dr_tag[0])
+                else:
+                    year_tag = audio.tags.get("TDER") or audio.tags.get("TYER")
+                    if year_tag:
+                        year = str(year_tag[0])
+                year = str(year)[:4]
+            else:
+                # Fallback to filename parsing?
+                # Format: NN - Artist - Title (Year) or similar
+                # We can try to regex it if ID3 failed.
+                pass
+
+            # Construct new name
+            # NN - Artist - Title (Year).mp3
+            track_num = f"{i:02d}"
+            new_filename = f"{track_num} - {artist} - {title} ({year}).mp3"
+            new_filename = sanitize_filename(new_filename)
+
+            # Directory needed
+            root = os.path.dirname(filepath)
+            new_filepath = os.path.join(root, new_filename)
+
+            if filepath != new_filepath:
+                try:
+                    os.rename(filepath, new_filepath)
+                    logger.info(
+                        f"Renamed: {os.path.basename(filepath)} -> {new_filename}"
+                    )
+                    count += 1
+                except OSError as e:
+                    logger.error(f"{RED}Failed to rename {filepath}: {e}{RESET}")
+                    errors += 1
+        except Exception as e:
+            logger.error(f"{RED}Error processing {filepath}: {e}{RESET}")
+            errors += 1
+
+    logger.info(f"{YELLOW}Sanitized {count} files. Errors: {errors}.{RESET}")
 
 
 def get_url_info(url):

@@ -10,6 +10,9 @@ from qobuz_dl.color import GREEN, RED, YELLOW
 from qobuz_dl.commands import qobuz_dl_args
 from qobuz_dl.core import QobuzDL
 from qobuz_dl.downloader import DEFAULT_FOLDER, DEFAULT_TRACK
+from qobuz_dl.utils import (
+    sanitize_directory,
+)
 
 logging.basicConfig(
     level=logging.INFO,
@@ -79,6 +82,10 @@ def _remove_leftovers(directory):
 def _handle_commands(qobuz, arguments):
     if arguments.rebuild_db:
         qobuz.rebuild_db()
+        return
+
+    if arguments.sanitize_dir:
+        sanitize_directory(arguments.sanitize_dir)
         return
 
     try:
