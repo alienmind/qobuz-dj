@@ -9,6 +9,17 @@ if [ "$MODE" == "dla" ]; then
 elif [ "$MODE" == "dlp" ]; then
     CMD_FLAGS="dl -q 5 --no-fallback --no-db --folder-format ."
     echo "[INFO] Mode: Playlist (Flattening, No Smart Discography)"
+elif [ "$MODE" == "dl" ]; then
+    if [[ "$PARAMS" == *"/artist/"* ]]; then
+        CMD_FLAGS="dl -q 5 --no-fallback -s --no-db"
+        echo "[INFO] Mode: Auto-detected Artist/Album (Smart Discography, No Flattening)"
+    elif [[ "$PARAMS" == *"/playlist/"* ]]; then
+        CMD_FLAGS="dl -q 5 --no-fallback --no-db --folder-format ."
+        echo "[INFO] Mode: Auto-detected Playlist (Flattening, No Smart Discography)"
+    else
+        echo "[WARNING] Could not detect type from URL. Defaulting to Artist/Album..."
+        CMD_FLAGS="dl -q 5 --no-fallback -s --no-db"
+    fi
 else
     echo "[ERROR] Invalid mode. Use 'dla' for Artist/Album or 'dlp' for Playlist."
     exit 1

@@ -15,8 +15,25 @@ if "%mode%"=="dla" (
         set "cmd_flags=dl -q 5 --no-fallback --no-db --folder-format ."
         echo [INFO] Mode: Playlist ^(Flattening, No Smart Discography^)
     ) else (
-        echo [ERROR] Invalid mode. Use 'dla' for Artist/Album or 'dlp' for Playlist.
-        exit /b 1
+        if "%mode%"=="dl" (
+            echo "%params%" | findstr /C:"/artist/" >nul
+            if not errorlevel 1 (
+                set "cmd_flags=dl -q 5 --no-fallback -s --no-db"
+                echo [INFO] Mode: Auto-detected Artist/Album ^(Smart Discography, No Flattening^)
+            ) else (
+                echo "%params%" | findstr /C:"/playlist/" >nul
+                if not errorlevel 1 (
+                    set "cmd_flags=dl -q 5 --no-fallback --no-db --folder-format ."
+                    echo [INFO] Mode: Auto-detected Playlist ^(Flattening, No Smart Discography^)
+                ) else (
+                    echo [WARNING] Could not detect type from URL. Defaulting to Artist/Album...
+                    set "cmd_flags=dl -q 5 --no-fallback -s --no-db"
+                )
+            )
+        ) else (
+            echo [ERROR] Invalid mode. Use 'dla' for Artist/Album, 'dlp' for Playlist, or 'dl' for auto-detect.
+            exit /b 1
+        )
     )
 )
 
