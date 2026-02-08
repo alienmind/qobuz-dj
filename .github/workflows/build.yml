@@ -1,0 +1,53 @@
+name: Build and Package
+
+on:
+  push:
+    branches: [ master, 'release/**' ]
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          version: "latest"
+
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install dependencies
+        run: uv sync --all-extras --dev
+
+      - name: Run Build (Check, Test, Package)
+        run: uv run poe build
+
+      - name: Rename binary (Unix)
+        if: matrix.os != 'windows-latest'
+        run: |
+          mv dist/qobuz-dj dist/qobuz-dj-${{ matrix.os }}
+        shell: bash
+
+      - name: Rename binary (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          mv dist/qobuz-dj.exe dist/qobuz-dj-windows.exe
+        shell: bash
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: qobuz-dj-binaries-${{ matrix.os }}
+          path: dist/qobuz-dj-*

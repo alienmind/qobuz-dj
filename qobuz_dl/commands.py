@@ -55,6 +55,21 @@ def dl_args(subparsers):
     return download
 
 
+def dj_args(subparsers):
+    dj = subparsers.add_parser(
+        "dj",
+        description="DJ Download Mode: identical to `dl -D`. Defaults to MP3 320 with embedded artwork.",
+        help="dj mode (shortcut for dl -D)",
+    )
+    dj.add_argument(
+        "SOURCE",
+        metavar="SOURCE",
+        nargs="+",
+        help=("one or more URLs (space separated) or a text file"),
+    )
+    return dj
+
+
 def sz_args(subparsers):
     sz = subparsers.add_parser(
         "sz",
@@ -159,10 +174,10 @@ def add_common_arg(custom_parser, default_folder, default_quality):
 
 def qobuz_dl_args(default_quality=6, default_limit=20, default_folder="MP3"):
     parser = argparse.ArgumentParser(
-        prog="qobuz-dl",
+        prog="qobuz-dj",
         description=(
-            "The ultimate Qobuz music downloader.\nSee usage"
-            " examples on https://github.com/vitiko98/qobuz-dl"
+            "The ultimate Qobuz music downloader for DJs.\nSee usage"
+            " examples on https://github.com/alienmind/qobuz-dl"
         ),
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -200,11 +215,12 @@ def qobuz_dl_args(default_quality=6, default_limit=20, default_folder="MP3"):
 
     interactive = fun_args(subparsers, default_limit)
     download = dl_args(subparsers)
+    dj = dj_args(subparsers)
     lucky = lucky_args(subparsers)
     sz_args(subparsers)
     [
         add_common_arg(i, default_folder, default_quality)
-        for i in (interactive, download, lucky)
+        for i in (interactive, download, dj, lucky)
     ]
 
     return parser

@@ -417,9 +417,9 @@ wheels = [
 ]
 
 [[package]]
-name = "qobuz-dl"
-version = "0.9.9.10"
-source = { virtual = "." }
+name = "qobuz-dj"
+version = "1.0.0a1"
+source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "mutagen" },

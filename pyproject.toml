@@ -1,6 +1,6 @@
 [project]
-name = "qobuz-dl"
-version = "0.9.9.10"
+name = "qobuz-dj"
+version = "1.0.0-alpha1"
 requires-python = ">=3.10"
 dependencies = [
     "beautifulsoup4>=4.14.3",
@@ -10,6 +10,19 @@ dependencies = [
     "requests>=2.32.5",
     "tqdm>=4.67.3",
 ]
+
+[project.scripts]
+qobuz-dj = "qobuz_dl.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv]
+package = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["qobuz_dl"]
 
 [tool.pyright]
 include = ["qobuz_dl", "tests"]
@@ -45,4 +58,4 @@ _check_ruff = "ruff check ."
 _check_pyright = "pyright"
 test = "pytest"
 build = ["check", "test", "server-build"]
-server-build = "pyinstaller --onefile --name qobuz-dl main.py"
+server-build = "pyinstaller --onefile --name qobuz-dj main.py"
