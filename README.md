@@ -2,7 +2,8 @@
 Search, explore and download Lossless and Hi-Res music from [Qobuz](https://www.qobuz.com/).
 **This is a maintained fork of [vitiko98/qobuz-dl](https://github.com/vitiko98/qobuz-dl), optimized for DJs and modern python environments.**
 
-[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VZWSWVGZGJRMU&source=url)
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=VZWSWVGZGJRMU&source=url)  
+*(You can donate to vitiko98 the original author of qobuz-dl - I don't have any economic interest)*
 
 ## Features
 * **DJ-Ready Downloads**: Automatic MP3 320kbps, proper tagging, and Smart Discography (clean folders, no duplicates).
