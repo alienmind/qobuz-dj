@@ -128,7 +128,7 @@ def add_common_arg(custom_parser, default_folder, default_quality):
         albums, high bit depth/dynamic range, and low sampling rates (to save space).""",
     )
     custom_parser.add_argument(
-        "-t",
+        "-T",
         "--top",
         metavar="int",
         const=5,

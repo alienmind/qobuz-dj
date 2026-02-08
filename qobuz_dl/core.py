@@ -167,7 +167,9 @@ class QobuzDL:
             )
         if url_type == "playlist" and not self.no_m3u_for_playlists:
             make_m3u(new_path)
-        else:
+        elif not type_dict["func"]:
+            # Only for types that don't have a func (album, track)
+            # artist/label/playlist have func and are handled in the loop above
             self.download_from_id(item_id, type_dict["album"])
 
     def download_list_of_urls(self, urls):
