@@ -32,8 +32,7 @@ class Client:
             {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:83.0) Gecko/20100101 Firefox/83.0",
                 "X-App-Id": self.id,
-                "Content-Type": "application/json;charset=UTF-8"
-
+                "Content-Type": "application/json;charset=UTF-8",
             }
         )
         self.base = "https://www.qobuz.com/api.json/0.2/"
@@ -158,6 +157,17 @@ class Client:
 
     def get_artist_meta(self, id):
         return self.multi_meta("artist/get", "albums_count", id, None)
+
+    def get_artist_top_tracks(self, id, limit=5):
+        # Using catalog/getFeaturedTracks for top tracks if available, or search?
+        # Qobuz API usually has artist/get which might NOT return top tracks directly unless "extra" is used.
+        # Let's try to use valid endpoint. "artist/get" with extra="tracks" usually works for top tracks?
+        # Actually, let's use search as a fallback or if we can't find a direct endpoint.
+        # But wait, looking at `search_tracks`, it searches by query.
+        # Let's try fetching artist with `extra=tracks`.
+        return self.api_call("artist/get", id=id, extra="tracks", limit=limit)[
+            "tracks"
+        ]["items"]
 
     def get_plist_meta(self, id):
         return self.multi_meta("playlist/get", "tracks_count", id, None)

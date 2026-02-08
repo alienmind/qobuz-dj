@@ -48,8 +48,7 @@ class QobuzDL:
         cover_og_quality=False,
         no_cover=False,
         downloads_db=None,
-        folder_format="{artist} - {album} ({year}) [{bit_depth}B-"
-        "{sampling_rate}kHz]",
+        folder_format="{artist} - {album} ({year}) [{bit_depth}B-{sampling_rate}kHz]",
         track_format="{tracknumber}. {tracktitle}",
         smart_discography=False,
     ):
@@ -67,7 +66,9 @@ class QobuzDL:
         self.downloads_db = create_db(downloads_db) if downloads_db else None
         self.folder_format = folder_format
         self.track_format = track_format
+        self.track_format = track_format
         self.smart_discography = smart_discography
+        self.top_tracks = None  # Will be set by cli.py
 
     def initialize_client(self, email, pwd, app_id, secrets):
         self.client = qopy.Client(email, pwd, app_id, secrets)
@@ -129,41 +130,43 @@ class QobuzDL:
             type_dict = possibles[url_type]
         except (KeyError, IndexError):
             logger.info(
-                f'{RED}Invalid url: "{url}". Use urls from ' "https://play.qobuz.com!"
+                f'{RED}Invalid url: "{url}". Use urls from https://play.qobuz.com!'
             )
             return
         if type_dict["func"]:
             content = [item for item in type_dict["func"](item_id)]
             content_name = content[0]["name"]
             logger.info(
-                f"{YELLOW}Downloading all the music from {content_name} "
-                f"({url_type})!"
+                f"{YELLOW}Downloading all the music from {content_name} ({url_type})!"
             )
             new_path = create_and_return_dir(
                 os.path.join(self.directory, sanitize_filename(content_name))
             )
 
-            if self.smart_discography and url_type == "artist":
-                # change `save_space` and `skip_extras` for customization
-                items = smart_discography_filter(
-                    content,
-                    save_space=True,
-                    skip_extras=True,
-                )
-            else:
-                items = [item[type_dict["iterable_key"]]["items"] for item in content][
-                    0
-                ]
+        if self.smart_discography and url_type == "artist":
+            # change `save_space` and `skip_extras` for customization
+            items = smart_discography_filter(
+                content,
+                save_space=True,
+                skip_extras=True,
+            )
+        elif not self.smart_discography and url_type == "artist" and self.top_tracks:
+            items = self.client.get_artist_top_tracks(item_id, self.top_tracks)
+            logger.info(f"{YELLOW}Downloading top {len(items)} tracks...")
+        else:
+            items = [item[type_dict["iterable_key"]]["items"] for item in content][0]
 
-            logger.info(f"{YELLOW}{len(items)} downloads in queue")
-            for item in items:
-                self.download_from_id(
-                    item["id"],
-                    True if type_dict["iterable_key"] == "albums" else False,
-                    new_path,
-                )
-            if url_type == "playlist" and not self.no_m3u_for_playlists:
-                make_m3u(new_path)
+        logger.info(f"{YELLOW}{len(items)} downloads in queue")
+        for item in items:
+            self.download_from_id(
+                item["id"],
+                True
+                if type_dict["iterable_key"] == "albums" and not self.top_tracks
+                else False,
+                new_path,
+            )
+        if url_type == "playlist" and not self.no_m3u_for_playlists:
+            make_m3u(new_path)
         else:
             self.download_from_id(item_id, type_dict["album"])
 
@@ -191,8 +194,7 @@ class QobuzDL:
                 logger.error(f"{RED}Invalid text file: {e}")
                 return
             logger.info(
-                f"{YELLOW}qobuz-dl will download {len(urls)}"
-                f" urls from file: {txt_file}"
+                f"{YELLOW}qobuz-dl will download {len(urls)} urls from file: {txt_file}"
             )
             self.download_list_of_urls(urls)
 
@@ -258,7 +260,6 @@ class QobuzDL:
                 fmt = PartialFormatter()
                 text = fmt.format(mode_dict["format"], **i)
                 if mode_dict["requires_extra"]:
-
                     text = "{} - {} [{}]".format(
                         text,
                         format_duration(i["duration"]),
@@ -301,12 +302,10 @@ class QobuzDL:
             selected_type = pick(item_types, "I'll search for:\n[press Intro]")[0][
                 :-1
             ].lower()
-            logger.info(f"{YELLOW}Ok, we'll search for " f"{selected_type}s{RESET}")
+            logger.info(f"{YELLOW}Ok, we'll search for {selected_type}s{RESET}")
             final_url_list = []
             while True:
-                query = input(
-                    f"{CYAN}Enter your search: [Ctrl + c to quit]\n" f"-{DF} "
-                )
+                query = input(f"{CYAN}Enter your search: [Ctrl + c to quit]\n-{DF} ")
                 logger.info(f"{YELLOW}Searching...{RESET}")
                 options = self.search_by_type(
                     query, selected_type, self.interactive_limit
@@ -331,8 +330,7 @@ class QobuzDL:
                     [final_url_list.append(i[0]["url"]) for i in selected_items]
                     y_n = pick(
                         ["Yes", "No"],
-                        "Items were added to queue to be downloaded. "
-                        "Keep searching?",
+                        "Items were added to queue to be downloaded. Keep searching?",
                     )
                     if y_n[0][0] == "N":
                         break
@@ -385,7 +383,7 @@ class QobuzDL:
         pl_title = sanitize_filename(soup.select_one("h1").text)
         pl_directory = os.path.join(self.directory, pl_title)
         logger.info(
-            f"{YELLOW}Downloading playlist: {pl_title} " f"({len(track_list)} tracks)"
+            f"{YELLOW}Downloading playlist: {pl_title} ({len(track_list)} tracks)"
         )
 
         for i in track_list:
